@@ -7,6 +7,7 @@ const { authCheck, adminCheck } = require("../middlewares/auth")
 //Import Controller
 const { create, read, update, remove, list } = require('../controllers/sub')
 
+//routes
 router.post("/sub", authCheck, adminCheck, create)
 
 router.get("/subs", list)

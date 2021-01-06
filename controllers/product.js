@@ -1,7 +1,6 @@
 const Product = require('../models/product')
 const User = require("../models/user")
 const slugify = require('slugify')
-const { aggregate } = require('../models/product')
 
 exports.create = async (req, res) => {
     try {
@@ -84,6 +83,8 @@ exports.update = async (req, res) => {
 //     }
 // }
 
+
+//WITH PAGINATION
 exports.list = async (req, res) => {
     try {
         const { sort, order, page } = req.body
@@ -114,8 +115,11 @@ exports.productStar = async (req, res) => {
     const user = await User.findOne({ email: req.user.email }).exec()
     const { star } = req.body
 
+    // who is updating?
+    // check if currently logged in user have already added rating to this product?
     let existingRatingObject = product.ratings.find((ele) => ele.postedBy.toString() === user._id.toString())
 
+    // if user haven't left rating yet, push it
     if (existingRatingObject === undefined) {
         let ratingAdded = await Product.findByIdAndUpdate(
             product._id,
@@ -126,6 +130,7 @@ exports.productStar = async (req, res) => {
         ).exec()
         res.json(ratingAdded)
     } else {
+        // if user haven't left rating yet, update it
         const ratingUpdated = await Product.updateOne(
             {
                 ratings: { $elemMatch: existingRatingObject }
@@ -153,6 +158,7 @@ exports.listRelated = async (req, res) => {
     res.json(related)
 }
 
+//SEARCH / FILTER
 const handleQuery = async (req, res) => {
     const products = await Product.find({ $text: { $search: query } })
         .populate("category", "_id name")
@@ -203,6 +209,7 @@ const handleStar = async (req, res, stars) => {
                 document: "$$ROOT",
                 floorAverage: {
                     $floor: { $avg: "$ratings.star" }
+                    //floor value of 3.33 will be 3
                 }
             }
         },
@@ -268,6 +275,7 @@ exports.searchFilters = async (req, res) => {
         await handleQuery(req, res, query)
     }
 
+    //price[20,200]
     if (price !== undefined) {
         await handlePrice(req, res, price)
     }

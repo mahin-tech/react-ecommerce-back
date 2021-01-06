@@ -7,11 +7,14 @@ const { authCheck, adminCheck } = require("../middlewares/auth")
 //Import Controller
 const { create, listAll, remove, read, update, list, productsCount, listRelated, productStar, searchFilters } = require('../controllers/product')
 
+//routes
 router.post("/product", authCheck, adminCheck, create)
 
-router.get("/products/:count", listAll)
+router.get("/products/:count", listAll) //products/100
 router.get("/product/:slug", read)
 router.get('/products/total', productsCount)
+
+//related
 router.get('/product/related/:productId', listRelated)
 
 router.delete("/product/:slug", authCheck, adminCheck, remove)

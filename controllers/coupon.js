@@ -1,5 +1,6 @@
 const Coupon = require('../models/coupon')
 
+//Create, Remove, List
 exports.create = async (req, res) => {
     try {
         const { name, expiry, discount } = req.body.coupon
